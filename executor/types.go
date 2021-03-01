@@ -22,8 +22,6 @@ type Value struct {
 	StringValue string
 }
 
-
-
 func NewTuple(inputs ...interface{}) Tuple {
 	if len(inputs)%2 != 0 {
 		panic(fmt.Sprintf("num inputs must be even, but was: %d", len(inputs)))

@@ -13,17 +13,16 @@ func TestSelectionWithScan(t *testing.T) {
 			"gender", "male",
 			"age", "21"),
 	}
-	values := []Value {
-			Value{
-				"gender",
-				"male",
-			},
-			Value{
-				"age",
-				"21",
-			},
+	values := []Value{
+		Value{
+			"gender",
+			"male",
+		},
+		Value{
+			"age",
+			"21",
+		},
 	}
-
 
 	expected := Tuple{values}
 	scanOp := NewScanOperator(tuples)

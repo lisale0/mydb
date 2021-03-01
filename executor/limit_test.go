@@ -51,4 +51,3 @@ func TestLimitOperatorMoreTuplesThanLimit(t *testing.T) {
 	}
 	is.Equal(false, limitOp.Next())
 }
-

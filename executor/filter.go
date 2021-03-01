@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-
 type FilterOperator struct {
 	tuples []Tuple
 	expr   string
@@ -17,15 +16,15 @@ type FilterOperator struct {
 func NewFilterOperator(tuples []Tuple, expr string, child Operator) Operator {
 	return &FilterOperator{
 		tuples: tuples,
-		expr: expr,
-		idx: -1,
-		child: child,
+		expr:   expr,
+		idx:    -1,
+		child:  child,
 	}
 }
 
 func (f *FilterOperator) Next() bool {
 	f.idx += 1
-	if f._isValidTuple() && f._hasValidNext(){
+	if f._isValidTuple() && f._hasValidNext() {
 		f.child.Execute()
 		return true
 	}
@@ -52,7 +51,7 @@ func (f *FilterOperator) _evaluateExpression() bool {
 	return false
 }
 
-func (f *FilterOperator) _evaluateBinary() (bool, error){
+func (f *FilterOperator) _evaluateBinary() (bool, error) {
 	s := strings.Split(f.expr, " ")
 	if len(s) < 3 {
 		return false, errors.New("invalid binary expression")
@@ -62,7 +61,7 @@ func (f *FilterOperator) _evaluateBinary() (bool, error){
 	right := s[2]
 
 	if op == "==" {
-		if f._checkEquality(left, right){
+		if f._checkEquality(left, right) {
 			return true, nil
 		}
 	}

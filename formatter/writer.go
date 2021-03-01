@@ -11,42 +11,38 @@ import (
 const LatestVersion = 1
 
 type Writer struct {
-	writer     io.Writer
-	uvarintBuf []byte
-	numRows int
+	writer      io.Writer
+	uvarintBuf  []byte
+	numRows     int
 	columnNames []string
 }
 
-
-func NewWriter(columnNames []string, numRows int, w io.Writer) *Writer{
+func NewWriter(columnNames []string, numRows int, w io.Writer) *Writer {
 	return &Writer{
-		writer: w,
+		writer:      w,
 		uvarintBuf:  make([]byte, binary.MaxVarintLen64), //max 8 bytes
-		numRows: numRows,
+		numRows:     numRows,
 		columnNames: columnNames,
-
 	}
 }
 
-
-func (w *Writer) WriteData(data executor.Tuple) {
-
-	//varintLen := binary.PutUvarint(w.uvarintBuf, x)
-	for _, i := range data.Values{
+func (w *Writer) WriteData(data executor.Tuple) error {
+	for _, i := range data.Values {
 		_, err := w.writer.Write([]byte(i.StringValue))
 		if err != nil {
-			fmt.Errorf("error writing to buffer")
+			return fmt.Errorf("error writing to buffer")
 		}
 	}
+	return nil
 }
 
 type Header struct {
-	Version int
-	NumRows int
+	Version     int
+	NumRows     int
 	ColumnNames []string
 }
 
-func (w *Writer) WriteHeader() {
+func (w *Writer) WriteHeader() error {
 	header := Header{
 		Version:     LatestVersion,
 		NumRows:     w.numRows,
@@ -54,19 +50,19 @@ func (w *Writer) WriteHeader() {
 	}
 	headerBytes, err := json.Marshal(&header)
 	if err != nil {
-		fmt.Errorf("%s", err)
+		return fmt.Errorf("%s", err)
 	}
 	/*length of header byte prepended before header data*/
 	if err := w.writeUVarint(uint64(len(headerBytes))); err != nil {
-		fmt.Errorf("error writing the length of header %s", err)
+		return fmt.Errorf("error writing the length of header %s", err)
 	}
 	if _, err = w.writer.Write(headerBytes); err != nil {
-		fmt.Errorf("error writeing header bytes %s", err)
+		return fmt.Errorf("error writeing header bytes %s", err)
 	}
+	return nil
 }
 
-
-func (w *Writer) WriteTuples(tuples []executor.Tuple) error{
+func (w *Writer) WriteTuples(tuples []executor.Tuple) error {
 	for _, tuple := range tuples {
 		if err := w.WriteTuple(tuple.Values); err != nil {
 			return fmt.Errorf("%v", err)

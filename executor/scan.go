@@ -1,15 +1,14 @@
 package executor
 
-
 type ScanOperator struct {
 	tuples []Tuple
-	idx int
+	idx    int
 }
 
 func NewScanOperator(tuples []Tuple) Operator {
 	return &ScanOperator{
 		tuples: tuples,
-		idx: -1,
+		idx:    -1,
 	}
 }
 
@@ -21,4 +20,3 @@ func (s *ScanOperator) Next() bool {
 func (s *ScanOperator) Execute() Tuple {
 	return s.tuples[s.idx]
 }
-

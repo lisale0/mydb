@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-
-
 func TestScanWithTuples(t *testing.T) {
 	is := assert.New(t)
 	tuples := []Tuple{

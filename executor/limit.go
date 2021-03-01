@@ -6,15 +6,13 @@ type LimitOperator struct {
 	child      Operator
 }
 
-
 func NewLimitOperator(tupleLen int, child Operator) Operator {
 	return &LimitOperator{
 		tupleLimit: tupleLen,
-		child: child,
-		idx: 0,
+		child:      child,
+		idx:        0,
 	}
 }
-
 
 func (l *LimitOperator) Next() bool {
 	valid := l._withinLimit() && l._hasValidNextChild()
@@ -35,4 +33,3 @@ func (l *LimitOperator) _withinLimit() bool {
 func (l *LimitOperator) _hasValidNextChild() bool {
 	return l.child.Next()
 }
-
