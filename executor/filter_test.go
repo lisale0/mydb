@@ -38,7 +38,6 @@ func TestFilterSimpleBinaryExpr(t *testing.T) {
 		NewTuple(
 			"id", "student2",
 			"gender", "female"),
-
 	}
 	scanOp := NewScanOperator(tuples)
 	expr := "id == male"
