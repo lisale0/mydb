@@ -14,7 +14,6 @@ func TestPageCreation(t *testing.T){
 	page.WriteNewHeader("testpage.dat", 1)
     file, _ := ioutil.ReadFile("testpage.dat")
     assert.Equal(t, binary.LittleEndian.Uint16(file[8:]), uint16(8192))
-    assert.FileExistsf(t, "testpage.dat", "")
 }
 
 

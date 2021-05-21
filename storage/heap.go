@@ -186,13 +186,17 @@ func (p *Page) FlushHeader(f io.Writer){
 /* look for env var MYDB_DATA and find where the data directory is */
 
 func (p *Page) SetFileEntry(fileName string)(*os.File, error){
+	/*
 	filedir := os.Getenv("MYDB_DATA")
-	pid := string(p.PageHeader.PageId)
+	pid := (p.PageHeader.PageId)
+	fmt.Print(pid)
 	name := filedir + "/" + fileName + pid
 	f, err := os.Create(name)
 	if err != nil {
 		return nil, err
 	}
 	fmt.Print(f)
-	return f, nil
+	*/
+
+	return nil, nil
 }

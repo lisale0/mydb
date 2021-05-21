@@ -38,7 +38,6 @@ func TestClock_New(t *testing.T){
 		3:true,
 		6:true,
 	}
-
 	//returns the index of the entries that needs to be evicted
 	pageToEvict := clock.PickVictim()
 	assert.Equal(t, pageToEvict, 111)
@@ -51,6 +50,7 @@ func TestBufMgr_PinPage(t *testing.T) {
 		456:true,
 		768:true,
 		21:false,
+
 
 	}
 	frameDescTable := []FrameDesc{
@@ -91,6 +91,7 @@ func TestBufMgr_PinPage(t *testing.T) {
 	bufmgr.PinPage(567, 0)
 	//assert.Equal(t, bufmgr.BufferPool[1].PageHeader.PageId, 567)
 	assert.Equal(t, bufmgr.BufHashTable.BufHashTableEntries[1].PageNum, 567)
+
 }
 
 
