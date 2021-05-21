@@ -1,3 +1,3 @@
 Mydb
 
-A recreation of a postgresql like database from scratch.
+A simple database from scratch.

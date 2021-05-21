@@ -76,7 +76,6 @@ func (f *FileScanner) ReadHeader() error {
 
 func (f *FileScanner) readTuple() error {
 	tuple := executor.Tuple{}
-
 	for _, column := range f.header.ColumnNames {
 		value := executor.Value{}
 		value.Name = column
