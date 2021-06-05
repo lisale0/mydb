@@ -11,21 +11,21 @@ type DataItem struct {
 	Data int
 }
 
-func NewDataItem(data int) DataItem{
+func NewDataItem(data int) DataItem {
 	return DataItem{
 		data,
 	}
 }
 
 type Node234 struct {
-	Parent *Node234
-	Children []Node234
-	NumItems int
+	Parent    *Node234
+	Children  []Node234
+	NumItems  int
 	DataItems []DataItem
-	IsLeaf bool
+	IsLeaf    bool
 }
 
-func NewNode234() Node234{
+func NewNode234() Node234 {
 	return Node234{
 		nil,
 		make([]Node234, 4),
@@ -41,13 +41,13 @@ type Tree234 struct {
 	Root *Node234
 }
 
-func NewTree234() Tree234{
+func NewTree234() Tree234 {
 	return Tree234{
 		Root: nil,
 	}
 }
 
-func (t *Tree234) Insert(key int) error{
+func (t *Tree234) Insert(key int) error {
 	currentNode := t.Root
 	if t.Root == nil {
 		rootNode := NewNode234()
@@ -69,7 +69,6 @@ func (t *Tree234) Split(n Node234) error {
 	itemC := n.RemoveItem()
 	itemB := n.RemoveItem()
 
-
 	// if the current node is root, make a new root
 	if n.IsRoot() {
 		root := Node234{}
@@ -84,7 +83,7 @@ func (t *Tree234) Split(n Node234) error {
 	numItems, _ := parent.GetNumItems()
 
 	// move the parent's connection one child at a time
-	for i:= numItems - 1; i > 0; i--{
+	for i := numItems - 1; i > 0; i-- {
 		temp := parent.DisconnectChild(i)
 		parent.ConnectChild(i+1, &temp)
 	}
@@ -102,10 +101,10 @@ func (t *Tree234) Split(n Node234) error {
 	return nil
 }
 
-func (n *Node234) InsertItem(key int) error{
+func (n *Node234) InsertItem(key int) error {
 	n.NumItems++
 	newKey := DataItem{key}
-	for i := 2; i>= 0; i-- {
+	for i := 2; i >= 0; i-- {
 		if n.DataItems[i].Data == int(INF) {
 			continue
 		} else {
@@ -113,9 +112,9 @@ func (n *Node234) InsertItem(key int) error{
 			fmt.Print(currentKey)
 
 			if newKey.Data < currentKey {
-				n.DataItems[i + 1].Data = n.DataItems[i].Data //Shift right
+				n.DataItems[i+1].Data = n.DataItems[i].Data //Shift right
 			} else {
-				n.DataItems[i + 1].Data = key
+				n.DataItems[i+1].Data = key
 
 				return nil
 			}
@@ -131,7 +130,7 @@ func (n *Node234) isFull() bool {
 		return false
 	}
 	fill := 0
-	for i := 0; i < len(n.DataItems); i++{
+	for i := 0; i < len(n.DataItems); i++ {
 		if n.DataItems[i].Data > int(INF) {
 			fill += 1
 		}
@@ -143,12 +142,10 @@ func (n *Node234) isFull() bool {
 	return false
 }
 
-
-
 func (n *Node234) RemoveItem() *DataItem {
 	//remove the largest item
 	var retDataItem DataItem
-	for i := len(n.DataItems)-1; i >= 0; i-- {
+	for i := len(n.DataItems) - 1; i >= 0; i-- {
 		retDataItem = n.DataItems[i]
 		if retDataItem.Data == int(INF) {
 			continue
@@ -183,10 +180,10 @@ func (n *Node234) ConnectChild(idx int, node *Node234) error {
 	if &node != nil {
 		node.Parent = n
 	}
-	 return nil
+	return nil
 }
 
-func (n *Node234) GetParent() (*Node234, error){
+func (n *Node234) GetParent() (*Node234, error) {
 	parent := n.Parent
 	if parent == nil {
 		return nil, fmt.Errorf("parent is nil")
@@ -194,11 +191,10 @@ func (n *Node234) GetParent() (*Node234, error){
 	return parent, nil
 }
 
-
-func (n *Node234) GetNumItems() (int, error){
+func (n *Node234) GetNumItems() (int, error) {
 	return len(n.DataItems), nil
 }
 
-func (n *Node234) IsRoot() bool{
+func (n *Node234) IsRoot() bool {
 	return n.Parent == nil
 }

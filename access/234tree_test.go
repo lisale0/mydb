@@ -1,7 +1,6 @@
 package access
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -19,17 +18,17 @@ func TestNewNode(t *testing.T) {
 	tree.Insert(40)
 }
 
-func TestRemoveDataItem(t *testing.T){
+func TestRemoveDataItem(t *testing.T) {
 	rootNode := Node234{
-			nil,
-			nil,
-			3,
-			[]DataItem{
-				DataItem{40},
-				DataItem{50},
-				DataItem{60},
-			},
-			true,
+		nil,
+		nil,
+		3,
+		[]DataItem{
+			DataItem{40},
+			DataItem{50},
+			DataItem{60},
+		},
+		true,
 	}
 	tree := Tree234{
 		&rootNode,
@@ -39,18 +38,17 @@ func TestRemoveDataItem(t *testing.T){
 	assert.Equal(t, tree.Root.NumItems, 2)
 }
 
-
 func TestDisconnectChild(t *testing.T) {
 	rootNode := Node234{
-			nil,
-			nil,
-			3,
-			[]DataItem{
-				DataItem{40},
-				DataItem{50},
-				DataItem{60},
-			},
-			true,
+		nil,
+		nil,
+		3,
+		[]DataItem{
+			DataItem{40},
+			DataItem{50},
+			DataItem{60},
+		},
+		true,
 	}
 	tree := Tree234{
 		&rootNode,
@@ -86,12 +84,4 @@ func TestConnectChild(t *testing.T) {
 	assert.Equal(t, rootNode.Children[0].DataItems, newNode.DataItems)
 	assert.Equal(t, *retParent, rootNode)
 
-}
-
-func TestSplit(t *testing.T){
-	tree := NewTree234()
-	tree.Insert(50)
-	tree.Insert(40)
-	tree.Insert(60)
-	fmt.Print(tree)
 }
