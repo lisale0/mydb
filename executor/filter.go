@@ -41,7 +41,7 @@ func (f *FilterOperator) _isValidTuple() bool {
 }
 
 func (f *FilterOperator) _evaluateExpression() bool {
-	if _, err := util.ParseBool(f.expr); err == nil {
+	if _, err := util.ParseBool(); err == nil {
 		return true
 	}
 	if _, err := f._evaluateBinary(); err == nil {

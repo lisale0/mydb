@@ -2,8 +2,6 @@ package formatter
 
 import (
 	"bytes"
-	"encoding/hex"
-	"fmt"
 	"github.com/lisale0/mydb/executor"
 	"testing"
 )
@@ -33,5 +31,4 @@ func TestWriteTuple(t *testing.T) {
 	}
 	writer.WriteHeader()
 	writer.WriteTuples(tuples)
-	fmt.Print(hex.Dump(buf.Bytes()))
 }

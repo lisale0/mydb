@@ -22,6 +22,20 @@ type Value struct {
 	StringValue string
 }
 
+// NewTupleWithVal new tuple with provided values passed in as a param
+func NewTupleWithVal(value []Value) Tuple{
+	var tuple Tuple
+
+
+	for i := 0; i < len(value); i ++{
+		tuple.Values = append(tuple.Values, Value{
+			Name:        value[i].Name,
+			StringValue: value[i].StringValue,
+		})
+	}
+	return tuple
+}
+
 func NewTuple(inputs ...interface{}) Tuple {
 	if len(inputs)%2 != 0 {
 		panic(fmt.Sprintf("num inputs must be even, but was: %d", len(inputs)))

@@ -11,43 +11,41 @@ const ROOTNODE = 1
 const INTERNALNODE = 2
 const LEAFNODE = 3
 
-
 type BPlusTree struct {
-	Root *BTreeNode
+	Root   *BTreeNode
 	Fanout int
 }
 
 type BTreeNode struct {
-	Parent *BTreeNode
-	NodeType int
+	Parent     *BTreeNode
+	NodeType   int
 	PrimaryKey int
-	Keys [][]int
-	Children []*BTreeNode
-
+	Keys       [][]int
+	Children   []*BTreeNode
 }
 
-func NewBTreeNode(nodeType int, key int) BTreeNode{
+func NewBTreeNode(nodeType int, key int) BTreeNode {
 	return BTreeNode{
-		Parent: nil,
-		NodeType: nodeType,
+		Parent:     nil,
+		NodeType:   nodeType,
 		PrimaryKey: key,
-		Keys: [][]int{},
-		Children: nil,
+		Keys:       [][]int{},
+		Children:   nil,
 	}
 }
 
 func NewBPlusTree(fanout int) BPlusTree {
 	return BPlusTree{
-		Root: nil,
+		Root:   nil,
 		Fanout: fanout,
 	}
 }
 
-func (b *BPlusTree) search() error{
+func (b *BPlusTree) search() error {
 	return nil
 }
 
-func (b *BPlusTree) insert(key int) error{
+func (b *BPlusTree) insert(key int) error {
 	/*if the root is nil return a new root node*/
 	if b.Root == nil {
 		newRootNode := BTreeNode{nil,
@@ -61,7 +59,7 @@ func (b *BPlusTree) insert(key int) error{
 	}
 
 	/*if there is still room in the keys for root*/
-	if len(b.Root.Keys[0]) < b.Fanout-1{
+	if len(b.Root.Keys[0]) < b.Fanout-1 {
 		b.Root.Keys[0] = append(b.Root.Keys[0], key)
 		sort.Ints(b.Root.Keys[0])
 	} else {
@@ -70,8 +68,6 @@ func (b *BPlusTree) insert(key int) error{
 	return nil
 }
 
-
-
 func (b *BPlusTree) split(node BTreeNode, key int, idx int) error {
 	lenKeys := len(node.Keys)
 	keysInIdx := append(node.Keys[idx], key)
@@ -79,7 +75,6 @@ func (b *BPlusTree) split(node BTreeNode, key int, idx int) error {
 	splitLen := len(keysInIdx) / 2
 	newParentKey := keysInIdx[splitLen]
 	fmt.Print(newParentKey)
-
 
 	leftSplit := keysInIdx[:splitLen]
 	rightSplit := keysInIdx[splitLen:]
@@ -95,7 +90,6 @@ func (b *BPlusTree) split(node BTreeNode, key int, idx int) error {
 	newNode.Keys[idx] = leftSplit
 	newNode.Keys[idx+1] = rightSplit
 	//newNode.Children = append(node.Children, &newNode)
-
 
 	/*update new root if new root*/
 	if node.NodeType == ROOTNODE {

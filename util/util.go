@@ -1,23 +1,41 @@
 package util
 
 import (
-	"errors"
-	"strconv"
+	"os"
 )
 
-type Expression interface {
-	Accept() error
-}
-
-type Expr struct {
-}
-
-type BinaryExpression struct {
-}
-
-func ParseBool(input string) (bool, error) {
-	if val, err := strconv.ParseBool(input); err == nil {
-		return val, nil
+func GetEnv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
 	}
-	return false, errors.New("invalid string input to check boolean")
+	return value
+}
+
+func FileExists(filePath string) bool {
+	if _, err := os.Stat(filePath); err == nil {
+		return true
+	}
+	return false
+}
+
+func CreateFile(filePath string) (*os.File, error) {
+	f, err := os.Create(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func OpenFile(filePath string) (*os.File, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func ParseBool() (bool, error) {
+	var err error
+	return true, err
 }

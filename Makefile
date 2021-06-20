@@ -8,3 +8,6 @@ test/coverage:
 
 vet:
 	go vet ./...
+
+fmt:
+	go fmt ./...
