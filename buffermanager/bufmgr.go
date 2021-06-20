@@ -1,14 +1,10 @@
 package buffermanager
 
 import (
-	"bytes"
-	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/lisale0/mydb/catalog"
 	"github.com/lisale0/mydb/dsm"
-	"github.com/lisale0/mydb/util"
-	"io/ioutil"
-	"os"
 )
 
 /*
@@ -137,8 +133,12 @@ func NewBufMgr(bufsize int, replacer Replacer, frameTable []FrameDesc) *BufMgr {
  * @param pageno page number
  * @param emptyPage true (empty page); false (non-empty page)
  */
+var tsCatalog *catalog.TableSpaceCatalog
 
-func (b *BufMgr) PinPage(pageNum int, emptyNum int) *dsm.Page {
+func (b *BufMgr) PinPage(pageNum int, emptyNum int) (*dsm.Page, error) {
+	var location *catalog.TableSpace
+	var err error
+
 	potentialCandidate := make(map[int]int, 4)
 	/** check if page is in buffer pool
 	 * if exists, increment pin count and return pointer to this page
@@ -146,14 +146,13 @@ func (b *BufMgr) PinPage(pageNum int, emptyNum int) *dsm.Page {
 	idx := b.BufHashTable.Hash(pageNum)
 	if b.BufHashTable.BufHashTableEntries[idx].PageNum == pageNum {
 		b.FrameTable[idx].PinCount += 1
-		return &b.BufferPool[idx]
+		return &b.BufferPool[idx], nil
 	}
 	// write out old values in the page before eviction if dirty bit is true
 	for i, v := range b.BufHashTable.BufHashTableEntries {
 		fmt.Print(i)
 		fmt.Print(v)
 		frame := b.FrameTable[v.FrameNum]
-		fmt.Print(frame)
 		if frame.PinCount == 0 {
 			potentialCandidate[i] = frame.PageNum
 		}
@@ -169,15 +168,18 @@ func (b *BufMgr) PinPage(pageNum int, emptyNum int) *dsm.Page {
 	for i, p := range b.BufferPool {
 		if p.PageHeader.PageId == dsm.PageId(evictPage) {
 			var page dsm.Page
-			//TODO find the file name associated with the pageID
-			//page.LoadPage("", 0755)
+			location, err = tsCatalog.GetTableSpace(dsm.PageId(pageNum))
+			if err != nil {
+				return nil, err
+			}
+			page = dsm.ReadPage(location.SpaceLocation)
 			b.FrameTable[evictIndex].PageNum = pageNum
 			b.BufHashTable.BufHashTableEntries[evictIndex].PageNum = pageNum
 			b.BufferPool[i] = page
-			continue
+			break
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 /**
@@ -247,46 +249,4 @@ func (b *BufMgr) FlushAllPages() {
 // get the total number of unpinned frames
 func (b *BufMgr) GetUnpinnedNum() {
 
-}
-
-func (d *BufMgr) WritePage(pageName string, pageNum int, pagePtr dsm.Page) (*os.File, error) {
-	var f *os.File
-	var err error
-
-	dataPath := util.GetEnv("DATAPATH", "/tmp")
-	filePath := fmt.Sprintf("%s/%s", dataPath, pageName)
-	if util.FileExists(filePath) {
-		f, err = util.OpenFile(filePath)
-	} else {
-		f, err = util.CreateFile(filePath)
-	}
-	if err != nil {
-		return nil, err
-	}
-	fmt.Print(f)
-	return nil, nil
-}
-
-func (d *BufMgr) ReadPage(file string, permissions int, p *dsm.Page) (*os.File, error) {
-	f, err := os.OpenFile(file, permissions, 0755)
-	if err != nil {
-		return f, err
-	}
-	b, _ := ioutil.ReadFile("testpage.dat")
-	buf := bytes.NewBuffer(b)
-	//binary.Read(buf, binary.LittleEndian, &p.Block)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.PageId)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.Upper)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.Lower)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.Size)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.Special)
-	//binary.Read(buf, binary.LittleEndian, &p.PageHeader.NumRecs)
-
-	p.PageHeader.SlotArr = make([]dsm.Slot, 2)
-
-	for i := 0; i < int(p.PageHeader.SlotCount); i++ {
-		binary.Read(buf, binary.LittleEndian, &p.PageHeader.SlotArr[i].Offset)
-		binary.Read(buf, binary.LittleEndian, &p.PageHeader.SlotArr[i].Length)
-	}
-	return f, nil
 }

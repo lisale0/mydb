@@ -113,7 +113,7 @@ func (p *Page) getPrevPage() PageId {
 
 // inserts a new record pointed to by recPtr with length recLen onto
 // the page, returns RID of record
-func (p *Page) insertRecord(tuple executor.Tuple) Status {
+func (p *Page) InsertRecord(tuple executor.Tuple) Status {
 	var newSlot Slot
 
 	newRecord := NewRecord(p.PageHeader.PageId, int16(len(p.PageHeader.SlotArr)+1), &tuple)
@@ -126,6 +126,8 @@ func (p *Page) insertRecord(tuple executor.Tuple) Status {
 	p.PageHeader.SlotArr = append(p.PageHeader.SlotArr, newSlot)
 
 	// increment slot count
+	p.PageHeader.FreeSpace -= newSlot.Length
+	p.PageHeader.Lower = newSlot.Offset
 	p.PageHeader.SlotCount += 1
 	return 1
 }

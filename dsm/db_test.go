@@ -12,7 +12,6 @@ import (
 func TestAddFileEntry(t *testing.T) {
 	db := NewDatabase("testdatabase")
 	db.AddFileEntry("mydbtestmovies", 1)
-	fmt.Print(db.Directory.FileEntries[0])
 	assert.Equal(t, db.Directory.FileEntries[0].FileName, "mydbtestmovies")
 	assert.Equal(t, db.Directory.FileEntries[0].FirstPageId, PageId(1))
 
@@ -72,7 +71,7 @@ func TestFlushRecord(t *testing.T) {
 	tuple := executor.NewTuple(
 		"id", "student1",
 		"gender", "male")
-	page.insertRecord(tuple)
+	page.InsertRecord(tuple)
 
 	WriteHeader(*f, page.PageHeader)
 	WriteTuples(*f, page)
@@ -90,4 +89,20 @@ func TestReadRecord(t *testing.T){
 	ReadTuples(b, &page)
 	assert.Equal(t, page.Records[0].Tuple.Values[0].StringValue, "student1")
 	assert.Equal(t, page.Records[0].Tuple.Values[1].StringValue, "male")
+}
+
+func TestWritePage(t *testing.T) {
+	header := NewPageHeader(PageId(5))
+	newPage := NewPage(header)
+	newPage.PageHeader.Columns = "id|gender"
+	tuple := executor.NewTuple("id", "student54", "gender", "other")
+	newPage.InsertRecord(tuple)
+	WritePage("/tmp/db-test-student.dat",newPage)
+	readPage := ReadPage("/tmp/db-test-student.dat")
+	assert.Equal(t, readPage.PageHeader.PageId, PageId(5))
+	assert.Equal(t, readPage.Records[0].Tuple.Values[0].Name, "id")
+	assert.Equal(t, readPage.Records[0].Tuple.Values[0].StringValue, "student54")
+	assert.Equal(t, readPage.Records[0].Tuple.Values[1].Name, "gender")
+	assert.Equal(t, readPage.Records[0].Tuple.Values[1].StringValue, "other")
+	os.Remove("/tmp/db-test-student.dat")
 }

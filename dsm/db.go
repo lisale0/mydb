@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/lisale0/mydb/executor"
 	"github.com/lisale0/mydb/util"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -62,8 +63,6 @@ func (d *Database) DeleteFileEntry(fileName string) error {
 func WriteHeader(f os.File, header PageHeader) error {
 	var err error
 	col := []byte(header.Columns)
-	fmt.Print(col)
-
 
 	bufSize := 19+(4*header.SlotCount) + uint16(len(col))
 	b := bytes.NewBuffer(make([]byte, bufSize))
@@ -89,6 +88,7 @@ func WriteHeader(f os.File, header PageHeader) error {
 		binary.LittleEndian.PutUint16(packet[packetIndex+2:], header.SlotArr[i].Length)
 		packetIndex += 4
 	}
+	f.Seek(0,0)
 	_, err = f.Write(packet)
 	if err != nil {
 		return err
@@ -107,19 +107,6 @@ func WriteTuples(f os.File, page Page) error {
 	return nil
 }
 
-func ReadTuples(b []byte, page *Page) error {
-	var records []Record
-
-	for i, slot := range page.PageHeader.SlotArr {
-		startIdx := slot.Offset
-		endIdx := slot.Offset + slot.Length
-		tuple := parseTuple(b[startIdx: endIdx], page.PageHeader.Columns)
-		record := NewRecord(page.PageHeader.PageId, int16(i), &tuple)
-		records = append(records, *record)
-	}
-	page.Records = records
-	return nil
-}
 
 // parseTuple extracts serialized a byte array into a tuple
 // takes in param b to deserialize, and build tuple based on the column names passed in
@@ -189,4 +176,38 @@ func ReadHeader(b []byte) (PageHeader, error){
 		binary.Read(buf, binary.LittleEndian, &pageHeader.SlotArr[i].Length)
 	}
 	return pageHeader, nil
+}
+
+func ReadTuples(b []byte, page *Page) error {
+	var records []Record
+
+	for i, slot := range page.PageHeader.SlotArr {
+		startIdx := slot.Offset
+		endIdx := slot.Offset + slot.Length
+		tuple := parseTuple(b[startIdx: endIdx], page.PageHeader.Columns)
+		record := NewRecord(page.PageHeader.PageId, int16(i), &tuple)
+		records = append(records, *record)
+	}
+	page.Records = records
+	return nil
+}
+
+func ReadPage(fileName string) Page{
+	var page Page
+	b, _ := ioutil.ReadFile(fileName)
+	header, _ := ReadHeader(b)
+	page.PageHeader = header
+	ReadTuples(b, &page)
+	return page
+}
+
+func WritePage(fileName string, page Page) error {
+	f, err := os.Create(fileName)
+	f.Truncate(8192)
+	if err != nil {
+		return err
+	}
+	WriteHeader(*f, page.PageHeader)
+	WriteTuples(*f, page)
+	return nil
 }
